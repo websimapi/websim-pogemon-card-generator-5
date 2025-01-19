@@ -37,6 +37,28 @@ async function sendToPoGePalace(cardData) {
       backupImageUrl: backupImageUrl,
       origin_trainer: pogepalace.party.client.username
     });
+
+    // Verify the record was stored by attempting to retrieve it
+    try {
+      const verifyRecords = await pogepalace.collection('pogemon')
+        .filter({ 
+          name: cardData.name,
+          description: cardData.description,
+          origin_trainer: pogepalace.party.client.username
+        })
+        .getList();
+      
+      if (verifyRecords && verifyRecords.length > 0) {
+        console.log('Successfully verified PoGePalace storage:', {
+          stored: verifyRecords[0],
+          original: pogeRecord
+        });
+      } else {
+        console.warn('Record created but not found in verification check');
+      }
+    } catch (verifyError) {
+      console.warn('Error verifying stored record:', verifyError);
+    }
     
     return pogeRecord;
   } catch (error) {
